@@ -1,0 +1,147 @@
+@import "../../shared/themes";
+
+canvas {
+  width: 100vh;
+  height: 100vw;
+}
+
+.block-info {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 256px;
+  height: 100vh;
+  z-index: 1;
+  background-color: rgba($light, 0.9);
+  color: black;
+  word-break: break-all;
+
+  .block-info-header {
+    padding: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: $neutral;
+  }
+
+  .block-info-body {
+    padding: 8px;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    height: calc(100vh - 64px);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+.top-right-buttons {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 160px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-bottom: 16px;
+  font-size: 12px;
+
+  select,
+  input[type="text"] {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .core-button {
+    display: block;
+    margin-left: auto;
+    margin-top: 8px;
+    margin-bottom: 48px;
+  }
+}
+
+.bottom-right-buttons {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: row;
+
+  button {
+    margin-left: 8px;
+  }
+}
+
+.accordion-button {
+  padding: 8px;
+  background: $light;
+}
+
+.accordion-body {
+  padding: 8px;
+}
+
+input[type="color"] {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.core-button {
+  width: 48px;
+}
+
+.log {
+  font-family: monospace;
+  line-height: 12px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.log-container {
+  max-height: 256px;
+  overflow-y: auto;
+  // scroll bar white
+  &::-webkit-scrollbar {
+    width: 8px;
+    background-color: $light;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $neutral;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: $light;
+  }
+  &::-webkit-scrollbar-button {
+    background-color: $light;
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: $light;
+  }
+  &::-webkit-scrollbar-track-piece {
+    background-color: $light;
+  }
+}
+
+.pseudo-link {
+  color: $primary;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.pseudo-link:hover {
+  color: $secondary;
+}
+
+.hover-hash {
+  color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  width: 100vw;
+  text-align: center;
+}

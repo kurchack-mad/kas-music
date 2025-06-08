@@ -1,0 +1,63 @@
+<div class="project" *ngIf="stateService.showUi">
+  <div><h3 class="mb-0">kas-music</h3></div>
+  <div>ISC License<fa-icon icon="info-circle" class="ms-2 pointer" (click)="showLicense = true"></fa-icon></div>
+  <a href="https://github.com/kurchack-mad/kas-music" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm mt-2 me-2"> GitHub </a>
+  <button class="btn btn-primary btn-sm mt-2" (click)="showDonate = true">Donate</button>
+</div>
+
+<img src="assets/images/logo.svg" alt="Kaspa logo" (click)="logoClick()" *ngIf="stateService.showUi" />
+
+<div class="node-error" *ngIf="stateService.nodeError">
+  <div class="error-text">{{ stateService.nodeError }}</div>
+  <button class="btn btn-primary" (click)="stateService.retryConnect$.next()">Reconnect</button>
+</div>
+
+<div class="cont">
+  <ng-container *ngIf="!loading">
+    <router-outlet *ngIf="initialized"></router-outlet>
+
+    <button class="btn btn-primary retry-button" (click)="loadKaspa()" *ngIf="!initialized">Reload</button>
+  </ng-container>
+</div>
+
+<div class="modal" tabindex="-1" *ngIf="showDonate">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Support kas-music</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="showDonate = false"></button>
+      </div>
+      <div class="modal-body">
+        <p>Your support helps me keep kas-music alive and improve it.</p>
+        <div>Donate to:</div>
+        <div class="address">
+          {{ kaspaAddress }}
+        </div>
+        <button class="btn btn-primary mt-2" (click)="copyToClipboard(kaspaAddress)">Copy</button>
+        <span *ngIf="copiedText" class="ms-2">Copied!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- as is license modal -->
+<div class="modal" tabindex="-1" *ngIf="showLicense">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">kas-music LICENSE</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="showLicense = false"></button>
+      </div>
+      <div class="modal-body">
+        <p>ISC License Copyright (c) {{ year }}, kurchack_mad</p>
+        <p>
+          Permission to use, copy, modify, and distribute this software for any purpose with or without fee is hereby granted, provided that the above
+          copyright notice and this permission notice appear in all copies. THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+          WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+          SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+          ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

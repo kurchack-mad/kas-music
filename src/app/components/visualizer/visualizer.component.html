@@ -1,0 +1,369 @@
+<canvas #canvas></canvas>
+<div id="stats-container" [hidden]="!showFps"></div>
+<div class="block-info" *ngIf="selectedBlock">
+  <div class="block-info-header">
+    <button class="btn btn-clear float-end" (click)="deselectBlock(selectedBlock)">
+      <fa-icon icon="times"></fa-icon>
+    </button>
+    <a class="btn btn-primary mb-2" [href]="getBlockLink(selectedBlock.userData['hash'])" target="_blank">Explorer</a>
+    <button class="btn btn-primary ms-2 mb-2" (click)="focusBlockWithHash(selectedBlock.userData['hash'])">Focus</button>
+  </div>
+  <div class="block-info-body">
+    <div class="mb-2"><b>Hash</b><br />{{ selectedBlock.userData["hash"] }}</div>
+    <div class="mb-2"><b>Color</b><br />{{ selectedBlock.userData["colorDescription"] }}</div>
+    <div class="mb-2"><b>Hash Merkle Root</b><br />{{ selectedBlock.userData["hashMerkleRoot"] }}</div>
+    <div class="mb-2"><b>Accepted ID Merkle Root</b><br />{{ selectedBlock.userData["acceptedIdMerkleRoot"] }}</div>
+    <div class="mb-2"><b>DAA Score</b><br />{{ selectedBlock.userData["daaScore"] }}</div>
+    <div class="mb-2"><b>Blue Score</b><br />{{ selectedBlock.userData["blueScore"] }}</div>
+    <div class="mb-2"><b>Pruning Point</b><br />{{ selectedBlock.userData["pruningPoint"] }}</div>
+    <div class="mb-2"><b>Timestamp</b><br />{{ selectedBlock.userData["timestamp"] }}</div>
+    <div class="mb-2"><b>UTXO Commitment</b><br />{{ selectedBlock.userData["utxoCommitment"] }}</div>
+    <div class="mb-2"><b>Nonce</b><br />{{ selectedBlock.userData["nonce"] }}</div>
+    <div class="mb-2"><b>Bits</b><br />{{ selectedBlock.userData["bits"] }}</div>
+    <div class="mb-2"><b>Version</b><br />{{ selectedBlock.userData["version"] }}</div>
+    <div class="mb-2"><b>Difficulty</b><br />{{ selectedBlock.userData["difficulty"] }}</div>
+    <div class="mb-2"><b>Is Chain Block</b><br />{{ selectedBlock.userData["isChainBlock"] }}</div>
+    <div class="mb-2"><b>Is Header Only</b><br />{{ selectedBlock.userData["isHeaderOnly"] }}</div>
+    <div class="mb-2">
+      <b>Selected Parent Hash</b><br />
+      <div
+        class="pseudo-link"
+        (click)="selectBlockWithHash(selectedBlock.userData['selectedParentHash'])"
+        (mouseover)="hoverBlockWithHash(selectedBlock.userData['selectedParentHash'])"
+        (mouseout)="dehoverBlock()"
+      >
+        {{ selectedBlock.userData["selectedParentHash"] }}
+      </div>
+    </div>
+    <div class="mb-2">
+      <b>Parents By Level</b><br />
+      <div *ngFor="let p of selectedBlock.userData['parentsByLevel']; let i = index">
+        <b>Level {{ i }}</b
+        ><br />
+        <div class="pseudo-link" *ngFor="let h of p" (click)="selectBlockWithHash(h)" (mouseover)="hoverBlockWithHash(h)" (mouseout)="dehoverBlock()">
+          {{ h }}
+        </div>
+      </div>
+    </div>
+    <div class="mb-2">
+      <b>Merge Set Blue</b><br />
+      <div
+        class="pseudo-link"
+        *ngFor="let h of selectedBlock.userData['mergeSetBluesHashes']"
+        (click)="dehoverBlock(); selectBlockWithHash(h)"
+        (mouseover)="hoverBlockWithHash(h)"
+        (mouseout)="dehoverBlock()"
+      >
+        {{ h }}
+      </div>
+      <div *ngIf="selectedBlock.userData['mergeSetBluesHashes'].length === 0">None</div>
+    </div>
+    <div class="mb-2">
+      <b>Merge Set Red</b><br />
+      <div
+        class="pseudo-link"
+        *ngFor="let h of selectedBlock.userData['mergeSetRedsHashes']"
+        (click)="dehoverBlock(); selectBlockWithHash(h)"
+        (mouseover)="hoverBlockWithHash(h)"
+        (mouseout)="dehoverBlock()"
+      >
+        {{ h }}
+      </div>
+      <div *ngIf="selectedBlock.userData['mergeSetRedsHashes'].length === 0">None</div>
+    </div>
+    <div class="mb-2"><b>Transactions: </b><br />{{ selectedBlock.userData["transactionCount"] }}</div>
+  </div>
+</div>
+
+<div class="top-right-buttons">
+  <div *ngIf="stateService.showUi">
+    <div ngbAccordion [closeOthers]="true" class="w-100">
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Network</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <select class="form-select form-select-sm mb-2" [ngModel]="selectedNetwork" (ngModelChange)="changeNetwork($event)">
+                <option *ngFor="let network of networks" [ngValue]="network">{{ network }}</option>
+              </select>
+              <div class="form-group">
+                <label for="nodeUrl">Node URL Override</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nodeUrl"
+                  placeholder="Enter node URL"
+                  [(ngModel)]="nodeUrl"
+                  (ngModelChange)="changeNodeUrl($event)"
+                />
+              </div>
+              <div class="form-check form-switch mt-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="autoReconnect"
+                  [(ngModel)]="autoReconnect"
+                  (ngModelChange)="changeAutoReconnect($event)"
+                />
+                <label class="form-check-label" for="showFps">Auto Reconnect</label>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Sound</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <select class="form-select form-select-sm mb-2" [ngModel]="soundTrackIndex" (ngModelChange)="changeSoundTrack($event)">
+                <option [ngValue]="null">No sound</option>
+                <option *ngFor="let track of soundTracks; let i = index" [ngValue]="i">{{ track.name }}</option>
+              </select>
+              <select class="form-select form-select-sm mb-2" [ngModel]="soundDirection" (ngModelChange)="changeSoundDirection($event)">
+                <option [ngValue]="1">Ascending Scale</option>
+                <option [ngValue]="-1">Descending Scale</option>
+              </select>
+              <select class="form-select form-select-sm mb-2" [ngModel]="selectedInstrument" (ngModelChange)="changeInstrument($event)">
+                <option *ngFor="let instrument of instruments" [ngValue]="instrument">{{ instrument }}</option>
+              </select>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Visuals</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <select class="form-select form-select-sm mt-2" [ngModel]="selectedPreset" (ngModelChange)="changePreset($event)">
+            <option *ngFor="let preset of presets" [ngValue]="preset.name">{{ preset.name }}</option>
+          </select>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div>
+                <label for="bloomStrength">Bloom Strength</label>
+                <input
+                  class="form-range"
+                  type="range"
+                  id="bloomStrength"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  [(ngModel)]="bloomStrength"
+                  (ngModelChange)="changeBloomStrength($event)"
+                />
+              </div>
+              <div>
+                <label for="bloomRadius">Bloom Radius</label>
+                <input
+                  class="form-range"
+                  type="range"
+                  id="bloomRadius"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  [(ngModel)]="bloomRadius"
+                  (ngModelChange)="changeBloomRadius($event)"
+                />
+              </div>
+              <div>
+                <label for="bloomThreshold">Bloom Threshold</label>
+                <input
+                  class="form-range"
+                  type="range"
+                  id="bloomThreshold"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  [(ngModel)]="bloomThreshold"
+                  (ngModelChange)="changeBloomThreshold($event)"
+                />
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showBlocks" [(ngModel)]="showBlocks" (ngModelChange)="changeShowBlocks($event)" />
+                <label class="form-check-label" for="showBlocks">Show Blocks</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showLines" [(ngModel)]="showLines" (ngModelChange)="changeShowLines($event)" />
+                <label class="form-check-label" for="showLines">Show Lines</label>
+              </div>
+              <!-- <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showText" [(ngModel)]="showText" (ngModelChange)="changeShowText($event)" />
+                <label class="form-check-label" for="showText">Show Text</label>
+              </div> -->
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showFog" [(ngModel)]="showFog" (ngModelChange)="changeShowFog($event)" />
+                <label class="form-check-label" for="showText">Show Fog</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="unsetBlockColor" [(ngModel)]="unsetBlockColor" (ngModelChange)="changeUnsetBlockColor($event)" />
+                <label for="unsetBlockColor">Unset Block</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="blueBlockColor" [(ngModel)]="blueBlockColor" (ngModelChange)="changeBlueBlockColor($event)" />
+                <label for="blueBlockColor">Blue Block</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="redBlockColor" [(ngModel)]="redBlockColor" (ngModelChange)="changeRedBlockColor($event)" />
+                <label for="redBlockColor">Red Block</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="mergeSetColor" [(ngModel)]="mergeSetColor" (ngModelChange)="changeMergeSetColor($event)" />
+                <label for="mergeSetBlockColor">Merge Set</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="selectedColor" [(ngModel)]="selectedColor" (ngModelChange)="changeSelectedColor($event)" />
+                <label for="selectedColor">Selected Block</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="lineColor" [(ngModel)]="lineColor" (ngModelChange)="changeLineColor($event)" />
+                <label for="lineColor">Line</label>
+              </div>
+              <div class="mt-2">
+                <input
+                  type="color"
+                  id="lineColorSelectedParent"
+                  [(ngModel)]="lineColorSelectedParent"
+                  (ngModelChange)="changeLineColorSelectedParent($event)"
+                />
+                <label for="lineColor">Selected Parent</label>
+              </div>
+              <div class="mt-2">
+                <input type="color" id="selectedChainColor" [(ngModel)]="selectedChainColor" (ngModelChange)="changeSelectedChainColor($event)" />
+                <label for="selectedChainColor">Selected Chain</label>
+              </div>
+              <!-- <div class="mt-2">
+                <input type="color" id="blockTextColor" [(ngModel)]="blockTextColor" (ngModelChange)="changeBlockTextColor($event)" />
+                <label for="blockTextColor">Block Text</label>
+              </div> -->
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Debugging</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="showFps" [(ngModel)]="showFps" (ngModelChange)="changeShowFps($event)" />
+                <label class="form-check-label" for="showFps">Show FPS</label>
+              </div>
+              <select class="form-select form-select-sm mb-2" [ngModel]="cacheTime" (ngModelChange)="changeCacheTime($event)">
+                <option [ngValue]="60">1m memory</option>
+                <option [ngValue]="300">5m memory</option>
+                <option [ngValue]="900">15m memory</option>
+                <option [ngValue]="1800">30m memory</option>
+                <option [ngValue]="3600">1h memory</option>
+                <option [ngValue]="7200">2h memory</option>
+                <option [ngValue]="14400">4h memory</option>
+              </select>
+              <div>
+                <label for="maxDist">Render Dist</label>
+                <input
+                  class="form-range"
+                  type="range"
+                  id="maxDist"
+                  min="1000"
+                  max="10000"
+                  step="50"
+                  [(ngModel)]="maxDist"
+                  (ngModelChange)="changeMaxDist($event)"
+                />
+              </div>
+              <div class="mt-2">Blocks: {{ blockCount }}</div>
+              <div class="mt-2">Lines: {{ lineCount }}</div>
+              <div class="mt-2">Start: {{ loadTimestamp | date: "MM/dd HH:mm:ss" }}</div>
+              <button class="btn btn-primary mt-2 w-100" (click)="resetAllSettings()">
+                <fa-icon icon="x" class="me-2"></fa-icon>
+                Reset All
+              </button>
+              <button class="btn btn-primary mt-2 w-100" (click)="saveToFile()" [disabled]="showLines">
+                <fa-icon icon="download" class="me-2"></fa-icon>
+                Save Data
+              </button>
+              <div class="w-100 mt-2">
+                <input type="file" class="hidden-file-input" accept=".json" id="importFile" (change)="loadFromFile($event)" />
+                <label class="w-100 btn btn-primary" for="importFile" [ngClass]="{ disabled: showLines }">
+                  <fa-icon icon="upload" class="me-2"></fa-icon>
+                  Load Data
+                </label>
+              </div>
+              <div *ngIf="showLines">
+                <div class="text-danger mt-2">Save/load disabled while lines are visible</div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <!-- <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Logs</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody class="bg-black">
+            <ng-template>
+              <select class="form-select form-select-sm mb-2" [ngModel]="logLevel" (ngModelChange)="changeLogLevel($event)">
+                <option [ngValue]="0">Info</option>
+                <option [ngValue]="1">Warning</option>
+                <option [ngValue]="2">Danger</option>
+              </select>
+              <div class="log-container">
+                <div
+                  class="log"
+                  *ngFor="let log of logs"
+                  [ngClass]="{ 'text-white': log.level === 0, 'text-warning': log.level === 1, 'text-danger': log.level === 2 }"
+                  (click)="focusBlockWithHash(log.hash)"
+                >
+                  {{ log.timestamp | date: "HH:mm:ss" }} - {{ log.message }}
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+  <button class="btn btn-primary core-button" (click)="toggleShowUi()">
+    <fa-icon [icon]="stateService.showUi ? 'eye-slash' : 'eye'"></fa-icon>
+  </button>
+</div>
+
+<div class="bottom-right-buttons" *ngIf="stateService.showUi">
+  <button class="btn btn-primary core-button" (click)="recenterCamera()">
+    <fa-icon icon="bullseye"></fa-icon>
+  </button>
+  <button
+    class="btn btn-primary core-button"
+    (mousedown)="setZoomDirection(-cameraSpeed)"
+    (mouseup)="setZoomDirection(0)"
+    (mouseleave)="setZoomDirection(0)"
+    (touchend)="setZoomDirection(0)"
+    (touchcancel)="setZoomDirection(0)"
+    (touchstart)="setZoomDirection(-cameraSpeed)"
+  >
+    <fa-icon icon="backward"></fa-icon>
+  </button>
+  <button
+    class="btn btn-primary core-button"
+    (mousedown)="setZoomDirection(cameraSpeed)"
+    (mouseup)="setZoomDirection(0)"
+    (mouseleave)="setZoomDirection(0)"
+    (touchend)="setZoomDirection(0)"
+    (touchcancel)="setZoomDirection(0)"
+    (touchstart)="setZoomDirection(cameraSpeed)"
+  >
+    <fa-icon icon="forward"></fa-icon>
+  </button>
+</div>
+
+<div class="hover-hash">
+  <span *ngIf="hoveredBlock">{{ hoveredBlock.userData["hash"] }}</span>
+</div>

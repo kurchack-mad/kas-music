@@ -1,0 +1,29 @@
+@import "app/shared/themes";
+@import "bootstrap/scss/bootstrap";
+
+html {
+  background: black;
+}
+
+body {
+  background: black;
+  height: 100vh;
+  overflow: hidden;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.modal {
+  display: block;
+}
+
+.pointer {
+  cursor: pointer;
+}
