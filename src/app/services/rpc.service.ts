@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as Kaspa from '../web/kaspa/kaspa.js';
+import { getSettingFromStorageOrQueryParam } from '../constants/network-utils.js';
 const { RpcClient } = Kaspa;
 
 @Injectable({
@@ -7,7 +8,7 @@ const { RpcClient } = Kaspa;
 })
 export class RpcService {
   private _rpc: Kaspa.RpcClient | undefined;
-  private _selectedNetwork: string = localStorage.getItem('selectedNetwork') || 'mainnet';
+  private _selectedNetwork: string = getSettingFromStorageOrQueryParam('selectedNetwork') || 'mainnet';
   private _currentNodeUrl: string | undefined;
   private _resolver: Kaspa.Resolver | undefined;
 

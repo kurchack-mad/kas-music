@@ -1,8 +1,9 @@
 <div class="project" *ngIf="stateService.showUi">
   <div><h3 class="mb-0">kas-music</h3></div>
-  <div>ISC License<fa-icon icon="info-circle" class="ms-2 pointer" (click)="showLicense = true"></fa-icon></div>
-  <a href="https://github.com/kurchack-mad/kas-music" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm mt-2 me-2"> GitHub </a>
-  <button class="btn btn-primary btn-sm mt-2" (click)="showDonate = true">Donate</button>
+  <div>License<fa-icon icon="info-circle" class="ms-2 pointer" (click)="showLicense = true"></fa-icon></div>
+  <!-- <a href="https://github.com/kurchack-mad/kas-music" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm mt-2 me-2"> GitHub </a> -->
+  <button class="btn btn-primary btn-sm mt-2 me-2" (click)="showDonate = true">Donate</button>
+  <button class="btn btn-primary btn-sm mt-2 me-2" (click)="showIntegrations = true">Integrations</button>
 </div>
 
 <img src="assets/images/logo.svg" alt="Kaspa logo" (click)="logoClick()" *ngIf="stateService.showUi" />
@@ -30,7 +31,7 @@
       <div class="modal-body">
         <p>Your support helps me keep kas-music alive and improve it.</p>
         <div>Donate to:</div>
-        <div class="address">
+        <div class="code-snippet">
           {{ kaspaAddress }}
         </div>
         <button class="btn btn-primary mt-2" (click)="copyToClipboard(kaspaAddress)">Copy</button>
@@ -57,6 +58,26 @@
           SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
           ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
         </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- integrations modal -->
+<div class="modal" tabindex="-1" *ngIf="showIntegrations">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Integrations</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="showIntegrations = false"></button>
+      </div>
+      <div class="modal-body">
+        <div>kas-music can be embedded in an iframe on your website or application</div>
+        <div class="code-snippet">&lt;iframe src="https://kas-music.web.app" width="100%" height="500px" frameborder="0"&gt;&lt;/iframe&gt;</div>
+        <div class="mt-3">Configure the network settings using query parameters:</div>
+        <div class="code-snippet">
+          https://kas-music.web.app?nodeUrl=wss:%2F%2Fanna.kaspa.stream%2Fkaspa%2Fmainnet%2Fwrpc%2Fborsh&selectedNetwork=mainnet
+        </div>
       </div>
     </div>
   </div>

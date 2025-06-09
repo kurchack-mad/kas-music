@@ -20,6 +20,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { IBlock } from '../../web/kaspa/kaspa';
 import { StateService } from '../../services/state.service';
 import { debounceTime } from 'rxjs';
+import { getSettingFromStorageOrQueryParam } from '../../constants/network-utils';
 
 const CAMERA_OFFSET = (Math.min(window.innerWidth, window.innerHeight) > 650 ? 250 : 350) * 2;
 const SELECTED_CHAIN_LINE_WIDTH = 3;
@@ -48,7 +49,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
 
   // options
-  public selectedNetwork: string = localStorage.getItem('selectedNetwork') || 'mainnet';
+  public selectedNetwork: string = getSettingFromStorageOrQueryParam('selectedNetwork') || 'mainnet';
   public networks: string[] = ['mainnet', 'testnet-10'];
   public soundTracks = SOUND_TRACKS;
   public soundTrackIndex: number | null = this.isSafari
@@ -71,7 +72,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
   public blockSize = 12;
   public showFog = localStorage.getItem('showFog') === null ? true : localStorage.getItem('showFog') === 'true';
   public showFps = localStorage.getItem('showFps') === null ? false : localStorage.getItem('showFps') === 'true';
-  public nodeUrl = localStorage.getItem('nodeUrl') === null ? undefined : localStorage.getItem('nodeUrl')!;
+  public nodeUrl = getSettingFromStorageOrQueryParam('nodeUrl') || undefined;
   public soundDirection = localStorage.getItem('soundDirection') === null ? 1 : parseInt(localStorage.getItem('soundDirection') ?? '1');
   public maxDist =
     localStorage.getItem('maxDist') === null || localStorage.getItem('maxDist') === '2000'
