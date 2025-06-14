@@ -17,7 +17,6 @@ export class AppComponent {
   public initialized = false;
   public showDonate = false;
   public showLicense = false;
-  public showIntegrations = false;
   public kaspaAddress = 'kaspa:qr4nttauujymttrc6yhajhn0jzvn65z6tuwye0ma6shzsm7u4z6mqd36hqa85';
   public copiedText: boolean = false;
   public year = new Date().getFullYear();
