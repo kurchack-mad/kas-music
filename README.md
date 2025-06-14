@@ -2,6 +2,8 @@
 
 A 3D visualizer for Kaspa. Notes play when blocks are added.
 
+Available at [kas-music.web.app](https://kas-music.web.app).
+
 ## Prerequisites
 
 - Node.js (v22+)
