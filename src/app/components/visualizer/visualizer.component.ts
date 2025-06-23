@@ -710,13 +710,13 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
   }
 
   private cull() {
-    const now = BigInt(Date.now());
+    const now = Date.now();
     const cacheTimeMs = this.cacheTime * 1000;
 
     this.lineHashes = this.lineHashes.filter(hash => {
       const line = this.lineHashLookup[hash];
       if (!line) return;
-      const diff = now - this.blockHashLookup[line.userData['fromHash']].userData['timestamp'];
+      const diff = now - this.blockHashLookup[line.userData['fromHash']].userData['visualizedAt'];
 
       if (diff > cacheTimeMs) {
         this.disposeLine(line);
@@ -729,7 +729,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     this.blockHashes = this.blockHashes.filter(hash => {
       const block = this.blockHashLookup[hash];
       if (!block) return;
-      const diff = now - block.userData['timestamp'];
+      const diff = now - block.userData['visualizedAt'];
       if (diff > cacheTimeMs) {
         const parents = block.userData['parentsByLevel'].flat();
         parents.forEach((parentHash: string) => {
@@ -877,6 +877,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
       block.userData = {
         ...blockData.header,
         ...blockData.verboseData,
+        visualizedAt: new Date().getTime(),
         originalColor: unsetBlockColorNumber,
         order: blockWorkingIndex,
         colorDescription: 'unset',
@@ -1223,10 +1224,11 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
   }
 
   private addLog(log: Log) {
-    if (this.logLevel > log.level) {
-      return;
-    }
-    this.logs.unshift(log);
+    // TODO: do we want logging?
+    // if (this.logLevel > log.level) {
+    //   return;
+    // }
+    // this.logs.unshift(log);
   }
 
   public saveToFile() {
@@ -1340,19 +1342,19 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
   }
 
   private watchAutoRefreshIfDisconnected() {
-    let lastBlockTime: Date | undefined;
+    let lastBlockTime: number | undefined;
     setInterval(() => {
       if (this.stateService.nodeError || !this.autoReconnect || this.didLoad) {
         return;
       }
       const block = this.blockHashes.length ? this.blockHashLookup[this.blockHashes[this.blockHashes.length - 1]] : undefined;
       if (block) {
-        lastBlockTime = new Date(Number(block.userData['timestamp']));
+        lastBlockTime = block.userData['visualizedAt'];
       }
 
       if (lastBlockTime) {
         const now = new Date();
-        const diff = Math.abs(now.getTime() - lastBlockTime.getTime());
+        const diff = Math.abs(now.getTime() - lastBlockTime);
         if (diff > MAX_SECONDS_WITHOUT_BLOCK * 1000) {
           this.stateService.retryConnect$.next();
         }

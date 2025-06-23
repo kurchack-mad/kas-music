@@ -55,7 +55,7 @@ export class RpcService {
     });
 
     await this._rpc.connect({
-      strategy: Kaspa.ConnectStrategy.Fallback,
+      strategy: Kaspa.ConnectStrategy.Retry,
     });
     console.log('Connected to', this._rpc.url);
   }
