@@ -2,7 +2,7 @@
 
 A 3D visualizer for Kaspa. Notes play when blocks are added.
 
-Available at [kas-music.web.app](https://kas-music.web.app).
+Available at [kas-music.pages.dev](https://kas-music.pages.dev).
 
 ## Prerequisites
 
@@ -26,11 +26,11 @@ Send a PR or open an issue.
 Embed kas-music in an iframe on your website or application:
 
 ```html
-<iframe src="https://kas-music.web.app" width="100%" height="500px" frameborder="0"></iframe>
+<iframe src="https://kas-music.pages.dev" width="100%" height="500px" frameborder="0"></iframe>
 ```
 
 Configure the network settings using query parameters:
 
 ```
-https://kas-music.web.app?nodeUrl=wss:%2F%2Fanna.kaspa.stream%2Fkaspa%2Fmainnet%2Fwrpc%2Fborsh&selectedNetwork=mainnet
+https://kas-music.pages.dev?nodeUrl=wss:%2F%2Fanna.kaspa.stream%2Fkaspa%2Fmainnet%2Fwrpc%2Fborsh&selectedNetwork=mainnet
 ```
